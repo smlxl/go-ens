@@ -53,7 +53,7 @@ func TestReverseResolve(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, err := ens.ReverseResolve(client, test.address)
+			res, err := ens.ReverseResolve(client, test.address, ens.EthereumMainnet)
 			if test.err != "" {
 				require.EqualError(t, err, test.err)
 			} else {

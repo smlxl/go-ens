@@ -35,7 +35,7 @@ type DNSResolver struct {
 
 // NewDNSResolver creates a new DNS resolver for a given domain.
 func NewDNSResolver(backend bind.ContractBackend, domain string) (*DNSResolver, error) {
-	registry, err := NewRegistry(backend)
+	registry, err := NewRegistry(backend, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}

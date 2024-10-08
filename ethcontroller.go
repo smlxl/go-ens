@@ -36,7 +36,7 @@ type ETHController struct {
 
 // NewETHController creates a new controller for a given domain.
 func NewETHController(backend bind.ContractBackend, domain string) (*ETHController, error) {
-	registry, err := NewRegistry(backend)
+	registry, err := NewRegistry(backend, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (c *ETHController) Renew(opts *bind.TransactOpts, domain string) (*types.Tr
 	}
 
 	// See if we're registered at all - fetch the owner to find out.
-	registry, err := NewRegistry(c.backend)
+	registry, err := NewRegistry(c.backend, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}

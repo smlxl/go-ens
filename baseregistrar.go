@@ -36,8 +36,8 @@ type BaseRegistrar struct {
 }
 
 // NewBaseRegistrar obtains the registrar contract for a given domain.
-func NewBaseRegistrar(backend bind.ContractBackend, domain string) (*BaseRegistrar, error) {
-	address, err := RegistrarContractAddress(backend, domain)
+func NewBaseRegistrar(backend bind.ContractBackend, domain string, chainId ChainId) (*BaseRegistrar, error) {
+	address, err := RegistrarContractAddress(backend, domain, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (r *BaseRegistrar) RegisteredWith(domain string) (string, error) {
 		return "", err
 	}
 	// See if we're registered at all - fetch the owner to find out.
-	registry, err := NewRegistry(r.backend)
+	registry, err := NewRegistry(r.backend, EthereumMainnet)
 	if err != nil {
 		return "", err
 	}

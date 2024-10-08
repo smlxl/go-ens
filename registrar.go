@@ -22,9 +22,9 @@ import (
 )
 
 // RegistrarContractAddress obtains the registrar contract address for a given domain.
-func RegistrarContractAddress(backend bind.ContractBackend, domain string) (common.Address, error) {
+func RegistrarContractAddress(backend bind.ContractBackend, domain string, chainId ChainId) (common.Address, error) {
 	// Obtain a registry contract.
-	registry, err := NewRegistry(backend)
+	registry, err := NewRegistry(backend, chainId)
 	if err != nil {
 		return UnknownAddress, err
 	}

@@ -29,15 +29,29 @@ type ReverseRegistrar struct {
 	ContractAddr common.Address
 }
 
+var registryAddress map[ChainId]string = map[ChainId]string{
+	EthereumMainnet: "addr.reverse",
+	BaseMainnet:     "80002105.reverse",
+}
+
+func getRegistryAddress(chainId ChainId) string {
+	n, ok := registryAddress[chainId]
+	if !ok {
+		n = "addr.reverse"
+	}
+	return n
+}
+
 // NewReverseRegistrar obtains the reverse registrar.
-func NewReverseRegistrar(backend bind.ContractBackend) (*ReverseRegistrar, error) {
-	registry, err := NewRegistry(backend)
+func NewReverseRegistrar(backend bind.ContractBackend, chainId ChainId) (*ReverseRegistrar, error) {
+	registry, err := NewRegistry(backend, chainId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Obtain the registry address from the registrar.
-	address, err := registry.Owner("addr.reverse")
+	n := getRegistryAddress(chainId)
+	address, err := registry.Owner(n)
 	if err != nil {
 		return nil, err
 	}
