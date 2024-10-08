@@ -1,6 +1,6 @@
 module github.com/wealdtech/go-ens/v3
 
-go 1.20
+go 1.22.3
 
 require (
 	github.com/ethereum/go-ethereum v1.12.2
