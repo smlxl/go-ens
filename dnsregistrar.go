@@ -32,7 +32,7 @@ type DNSRegistrar struct {
 
 // NewDNSRegistrar obtains the registrar contract for a given domain.
 func NewDNSRegistrar(backend bind.ContractBackend, domain string) (*DNSRegistrar, error) {
-	address, err := RegistrarContractAddress(backend, domain)
+	address, err := RegistrarContractAddress(backend, domain, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}

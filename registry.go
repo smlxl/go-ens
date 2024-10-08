@@ -27,6 +27,18 @@ import (
 	"github.com/wealdtech/go-ens/v3/util"
 )
 
+type ChainId uint64
+
+const (
+	EthereumMainnet ChainId = 1
+	BaseMainnet     ChainId = 8453
+)
+
+var chainRegistryContractAddress map[ChainId]common.Address = map[ChainId]common.Address{
+	EthereumMainnet: common.HexToAddress("00000000000C2E074eC69A0dFb2997BA6C7d2e1e"),
+	BaseMainnet:     common.HexToAddress("b94704422c2a1e396835a571837aa5ae53285a95"),
+}
+
 // Registry is the structure for the registry contract.
 type Registry struct {
 	backend      bind.ContractBackend
@@ -35,8 +47,8 @@ type Registry struct {
 }
 
 // NewRegistry obtains the ENS registry.
-func NewRegistry(backend bind.ContractBackend) (*Registry, error) {
-	address, err := RegistryContractAddress(backend)
+func NewRegistry(backend bind.ContractBackend, chainId ChainId) (*Registry, error) {
+	address, err := RegistryContractAddress(backend, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -115,9 +127,13 @@ func (r *Registry) SetSubdomainOwner(opts *bind.TransactOpts, name string, subna
 }
 
 // RegistryContractAddress obtains the address of the registry contract for a chain.
-// This is (currently) the same for all chains.
-func RegistryContractAddress(_ bind.ContractBackend) (common.Address, error) {
-	// Instantiate the registry contract.  The same for all chains.
+func RegistryContractAddress(_ bind.ContractBackend, chainId ChainId) (common.Address, error) {
+	address, ok := chainRegistryContractAddress[chainId]
+	if ok {
+		return address, nil
+	}
+
+	// Default to Ethereum mainnet.
 	return common.HexToAddress("00000000000C2E074eC69A0dFb2997BA6C7d2e1e"), nil
 }
 

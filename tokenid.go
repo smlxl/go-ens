@@ -29,7 +29,7 @@ func DeriveTokenID(backend bind.ContractBackend, domain string) (string, error) 
 	if domain == "" {
 		return "", errors.New("empty domain")
 	}
-	_, err := Resolve(backend, domain)
+	_, err := Resolve(backend, domain, EthereumMainnet)
 	if err != nil {
 		return "", err
 	}

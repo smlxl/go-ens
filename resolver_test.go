@@ -27,17 +27,17 @@ import (
 var client, _ = ethclient.Dial("https://mainnet.infura.io/v3/831a5442dc2e4536a9f8dee4ea1707a6")
 
 func TestResolveEmpty(t *testing.T) {
-	_, err := Resolve(client, "")
+	_, err := Resolve(client, "", EthereumMainnet)
 	assert.NotNil(t, err, "Resolved empty name")
 }
 
 func TestResolveZero(t *testing.T) {
-	_, err := Resolve(client, "0")
+	_, err := Resolve(client, "0", EthereumMainnet)
 	assert.NotNil(t, err, "Resolved empty name")
 }
 
 func TestResolveNotPresent(t *testing.T) {
-	_, err := Resolve(client, "sirnotappearinginthisregistry.eth")
+	_, err := Resolve(client, "sirnotappearinginthisregistry.eth", EthereumMainnet)
 	require.NotNil(t, err, "Resolved name that does not exist")
 	assert.Equal(t, "unregistered name", err.Error(), "Unexpected error")
 }
@@ -49,55 +49,55 @@ func TestResolveNotPresent(t *testing.T) {
 // }
 
 func TestResolveBadResolver(t *testing.T) {
-	_, err := Resolve(client, "resolvestozero.eth")
+	_, err := Resolve(client, "resolvestozero.eth", EthereumMainnet)
 	require.NotNil(t, err, "Resolved name with a bad resolver")
 	assert.Equal(t, "no address", err.Error(), "Unexpected error")
 }
 
 func TestResolveTestEnsTest(t *testing.T) {
 	expected := "ed96dd3be847b387217ef9de5b20d8392a6cdf40"
-	actual, err := Resolve(client, "test.enstest.eth")
+	actual, err := Resolve(client, "test.enstest.eth", EthereumMainnet)
 	require.Nil(t, err, "Error resolving name")
 	assert.Equal(t, expected, hex.EncodeToString(actual[:]), "Did not receive expected result")
 }
 
 func TestResolveResolverEth(t *testing.T) {
 	expected := "231b0ee14048e9dccd1d247744d114a4eb5e8e63"
-	actual, err := Resolve(client, "resolver.eth")
+	actual, err := Resolve(client, "resolver.eth", EthereumMainnet)
 	require.Nil(t, err, "Error resolving name")
 	assert.Equal(t, expected, hex.EncodeToString(actual[:]), "Did not receive expected result")
 }
 
 func TestResolveEthereum(t *testing.T) {
 	expected := "de0b295669a9fd93d5f28d9ec85e40f4cb697bae"
-	actual, err := Resolve(client, "ethereum.eth")
+	actual, err := Resolve(client, "ethereum.eth", EthereumMainnet)
 	require.Nil(t, err, "Error resolving name")
 	assert.Equal(t, expected, hex.EncodeToString(actual[:]), "Did not receive expected result")
 }
 
 func TestResolveAddress(t *testing.T) {
 	expected := "b8c2c29ee19d8307cb7255e1cd9cbde883a267d5"
-	actual, err := Resolve(client, "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5")
+	actual, err := Resolve(client, "0xb8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5", EthereumMainnet)
 	require.Nil(t, err, "Error resolving address")
 	assert.Equal(t, expected, hex.EncodeToString(actual[:]), "Did not receive expected result")
 }
 
 func TestResolveShortAddress(t *testing.T) {
 	expected := "0000000000000000000000000000000000000001"
-	actual, err := Resolve(client, "0x1")
+	actual, err := Resolve(client, "0x1", EthereumMainnet)
 	require.Nil(t, err, "Error resolving address")
 	assert.Equal(t, expected, hex.EncodeToString(actual[:]), "Did not receive expected result")
 }
 
 func TestResolveHexString(t *testing.T) {
-	_, err := Resolve(client, "0xe32c6d1a964749b6de2130e20daed821a45b9e7261118801ff5319d0ffc6b54a")
+	_, err := Resolve(client, "0xe32c6d1a964749b6de2130e20daed821a45b9e7261118801ff5319d0ffc6b54a", EthereumMainnet)
 	assert.NotNil(t, err, "Resolved too-long hex string")
 }
 
 func TestReverseResolveTestEnsTest(t *testing.T) {
 	expected := "nick.eth"
 	address := common.HexToAddress("b8c2C29ee19D8307cb7255e1Cd9CbDE883A267d5")
-	actual, err := ReverseResolve(client, address)
+	actual, err := ReverseResolve(client, address, EthereumMainnet)
 	require.Nil(t, err, "Error resolving address")
 	assert.Equal(t, expected, actual, "Did not receive expected result")
 }

@@ -27,27 +27,29 @@ import (
 type ReverseResolver struct {
 	Contract     *reverseresolver.Contract
 	ContractAddr common.Address
+	ChainId      ChainId
 }
 
 // NewReverseResolverFor creates a reverse resolver contract for the given address.
-func NewReverseResolverFor(backend bind.ContractBackend, address common.Address) (*ReverseResolver, error) {
-	registry, err := NewRegistry(backend)
+func NewReverseResolverFor(backend bind.ContractBackend, address common.Address, chainId ChainId) (*ReverseResolver, error) {
+	registry, err := NewRegistry(backend, chainId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Now fetch the resolver.
-	domain := fmt.Sprintf("%x.addr.reverse", address.Bytes())
+	n := getRegistryAddress(chainId)
+	domain := fmt.Sprintf("%x.%s", address.Bytes(), n)
 	contractAddress, err := registry.ResolverAddress(domain)
 	if err != nil {
 		return nil, err
 	}
-	return NewReverseResolverAt(backend, contractAddress)
+	return NewReverseResolverAt(backend, contractAddress, chainId)
 }
 
 // NewReverseResolver obtains the reverse resolver.
-func NewReverseResolver(backend bind.ContractBackend) (*ReverseResolver, error) {
-	reverseRegistrar, err := NewReverseRegistrar(backend)
+func NewReverseResolver(backend bind.ContractBackend, chainId ChainId) (*ReverseResolver, error) {
+	reverseRegistrar, err := NewReverseRegistrar(backend, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -58,11 +60,11 @@ func NewReverseResolver(backend bind.ContractBackend) (*ReverseResolver, error) 
 		return nil, err
 	}
 
-	return NewReverseResolverAt(backend, address)
+	return NewReverseResolverAt(backend, address, chainId)
 }
 
 // NewReverseResolverAt obtains the reverse resolver at a given address.
-func NewReverseResolverAt(backend bind.ContractBackend, address common.Address) (*ReverseResolver, error) {
+func NewReverseResolverAt(backend bind.ContractBackend, address common.Address, chainId ChainId) (*ReverseResolver, error) {
 	// Instantiate the reverse registrar contract.
 	contract, err := reverseresolver.NewContract(address, backend)
 	if err != nil {
@@ -70,7 +72,9 @@ func NewReverseResolverAt(backend bind.ContractBackend, address common.Address) 
 	}
 
 	// Ensure the contract is a resolver.
-	nameHash, err := NameHash("0.addr.reverse")
+	n := getRegistryAddress(chainId)
+	name := fmt.Sprintf("0.%s", n)
+	nameHash, err := NameHash(name)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +86,15 @@ func NewReverseResolverAt(backend bind.ContractBackend, address common.Address) 
 	return &ReverseResolver{
 		Contract:     contract,
 		ContractAddr: address,
+		ChainId:      chainId,
 	}, nil
 }
 
 // Name obtains the name for an address.
 func (r *ReverseResolver) Name(address common.Address) (string, error) {
-	nameHash, err := NameHash(fmt.Sprintf("%s.addr.reverse", address.Hex()[2:]))
+	ra := getRegistryAddress(r.ChainId)
+	n := fmt.Sprintf("%s.%s", address.Hex()[2:], ra)
+	nameHash, err := NameHash(n)
 	if err != nil {
 		return "", err
 	}
@@ -95,8 +102,8 @@ func (r *ReverseResolver) Name(address common.Address) (string, error) {
 }
 
 // Format provides a string version of an address, reverse resolving it if possible.
-func Format(backend bind.ContractBackend, address common.Address) string {
-	result, err := ReverseResolve(backend, address)
+func Format(backend bind.ContractBackend, address common.Address, chainId ChainId) string {
+	result, err := ReverseResolve(backend, address, chainId)
 	if err != nil {
 		result = address.Hex()
 	}
@@ -105,8 +112,8 @@ func Format(backend bind.ContractBackend, address common.Address) string {
 
 // ReverseResolve resolves an address in to an ENS name.
 // This will return an error if the name is not found or otherwise 0.
-func ReverseResolve(backend bind.ContractBackend, address common.Address) (string, error) {
-	resolver, err := NewReverseResolverFor(backend, address)
+func ReverseResolve(backend bind.ContractBackend, address common.Address, chainId ChainId) (string, error) {
+	resolver, err := NewReverseResolverFor(backend, address, chainId)
 	if err != nil {
 		return "", err
 	}

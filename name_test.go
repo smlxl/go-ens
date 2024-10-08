@@ -297,7 +297,7 @@ func TestNameSubdomainCreate(t *testing.T) {
 	// Confirm registrantship of the subdomain
 	subdomain := fmt.Sprintf("%s.foobar5.eth", sub)
 
-	registry, err := NewRegistry(client)
+	registry, err := NewRegistry(client, EthereumMainnet)
 	require.Nil(t, err, "Failed to create registry")
 	controller, err := registry.Owner(subdomain)
 	require.Nil(t, err, "Failed to obtain subname's controller")
@@ -579,7 +579,7 @@ func waitForTransaction(client *ethclient.Client, txHash common.Hash) {
 
 func unregisteredDomain(client *ethclient.Client) string {
 	rand.Seed(time.Now().UTC().UnixNano())
-	registry, _ := NewRegistry(client)
+	registry, _ := NewRegistry(client, EthereumMainnet)
 	for {
 		// #nosec G404
 		domain := fmt.Sprintf("go-ens-test-%d.eth", rand.Int31())

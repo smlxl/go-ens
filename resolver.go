@@ -41,8 +41,8 @@ type Resolver struct {
 }
 
 // NewResolver obtains an ENS resolver for a given domain.
-func NewResolver(backend bind.ContractBackend, domain string) (*Resolver, error) {
-	registry, err := NewRegistry(backend)
+func NewResolver(backend bind.ContractBackend, domain string, chainId ChainId) (*Resolver, error) {
+	registry, err := NewRegistry(backend, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -92,8 +92,8 @@ func NewResolverAt(backend bind.ContractBackend, domain string, address common.A
 }
 
 // PublicResolverAddress obtains the address of the public resolver for a chain.
-func PublicResolverAddress(backend bind.ContractBackend) (common.Address, error) {
-	return Resolve(backend, "resolver.eth")
+func PublicResolverAddress(backend bind.ContractBackend, chainId ChainId) (common.Address, error) {
+	return Resolve(backend, "resolver.eth", chainId)
 }
 
 // Address returns the Ethereum address of the domain.
@@ -182,9 +182,9 @@ func (r *Resolver) InterfaceImplementer(interfaceID [4]byte) (common.Address, er
 
 // Resolve resolves an ENS name in to an Etheruem address.
 // This will return an error if the name is not found or otherwise 0.
-func Resolve(backend bind.ContractBackend, input string) (common.Address, error) {
+func Resolve(backend bind.ContractBackend, input string, chainId ChainId) (common.Address, error) {
 	if strings.Contains(input, ".") {
-		return resolveName(backend, input)
+		return resolveName(backend, input, chainId)
 	}
 	if (strings.HasPrefix(input, "0x") && len(input) > 42) || (!strings.HasPrefix(input, "0x") && len(input) > 40) {
 		return UnknownAddress, errors.New("address too long")
@@ -197,7 +197,7 @@ func Resolve(backend bind.ContractBackend, input string) (common.Address, error)
 	return address, nil
 }
 
-func resolveName(backend bind.ContractBackend, input string) (common.Address, error) {
+func resolveName(backend bind.ContractBackend, input string, chainId ChainId) (common.Address, error) {
 	nameHash, err := NameHash(input)
 	if err != nil {
 		return UnknownAddress, err
@@ -205,7 +205,7 @@ func resolveName(backend bind.ContractBackend, input string) (common.Address, er
 	if bytes.Equal(nameHash[:], zeroHash) {
 		return UnknownAddress, errors.New("bad name")
 	}
-	address, err := resolveHash(backend, input)
+	address, err := resolveHash(backend, input, chainId)
 	if err != nil {
 		return UnknownAddress, err
 	}
@@ -213,8 +213,8 @@ func resolveName(backend bind.ContractBackend, input string) (common.Address, er
 	return address, nil
 }
 
-func resolveHash(backend bind.ContractBackend, domain string) (common.Address, error) {
-	resolver, err := NewResolver(backend, domain)
+func resolveHash(backend bind.ContractBackend, domain string, chainId ChainId) (common.Address, error) {
+	resolver, err := NewResolver(backend, domain, chainId)
 	if err != nil {
 		return UnknownAddress, err
 	}

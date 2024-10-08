@@ -44,7 +44,7 @@ type AuctionEntry struct {
 
 // NewAuctionRegistrar creates a new auction registrar for a given domain.
 func NewAuctionRegistrar(backend bind.ContractBackend, domain string) (*AuctionRegistrar, error) {
-	address, err := RegistrarContractAddress(backend, domain)
+	address, err := RegistrarContractAddress(backend, domain, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (r *AuctionRegistrar) Entry(domain string) (*AuctionEntry, error) {
 		entry.State = "Bidding"
 	case 2:
 		// Might be won or owned.
-		registry, err := NewRegistry(r.backend)
+		registry, err := NewRegistry(r.backend, EthereumMainnet)
 		if err != nil {
 			return nil, err
 		}

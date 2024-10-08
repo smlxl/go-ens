@@ -54,11 +54,11 @@ func NewName(backend bind.ContractBackend, name string) (*Name, error) {
 		return nil, err
 	}
 
-	registry, err := NewRegistry(backend)
+	registry, err := NewRegistry(backend, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}
-	registrar, err := NewBaseRegistrar(backend, domain)
+	registrar, err := NewBaseRegistrar(backend, domain, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}
@@ -295,8 +295,8 @@ func (n *Name) SetResolverAddress(address common.Address, opts *bind.TransactOpt
 
 // Address fetches the address of the name for a given coin type.
 // Coin types are defined at https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-func (n *Name) Address(coinType uint64) ([]byte, error) {
-	resolver, err := NewResolver(n.backend, n.Name)
+func (n *Name) Address(coinType uint64, chainId ChainId) ([]byte, error) {
+	resolver, err := NewResolver(n.backend, n.Name, chainId)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (n *Name) Address(coinType uint64) ([]byte, error) {
 // SetAddress sets the address of the name for a given coin type.
 // Coin types are defined at https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 func (n *Name) SetAddress(coinType uint64, address []byte, opts *bind.TransactOpts) (*types.Transaction, error) {
-	resolver, err := NewResolver(n.backend, n.Name)
+	resolver, err := NewResolver(n.backend, n.Name, EthereumMainnet)
 	if err != nil {
 		return nil, err
 	}
